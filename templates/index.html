@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OVA — Next-Gen AI Studio</title>
+
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- KaTeX for Math Typesetting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Highlight.js for Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <!-- Marked.js for Markdown Parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Custom Obsidian Glassmorphic Stylesheet -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- ====================================================================
+         SIDEBAR NAVIGATION
+         ==================================================================== -->
+    <aside class="sidebar" id="sidebar">
+      <!-- Brand Header -->
+      <div class="sidebar-header">
+        <a href="#" class="brand">
+          <div class="brand-orb"></div>
+          <div class="brand-text">
+            <span class="brand-title">OVA</span>
+            <span class="brand-tag">Next-Gen AI Core</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Action Area -->
+      <div class="sidebar-actions">
+        <button class="btn-new-chat" id="newChatBtn">
+          <i class="fa-solid fa-plus"></i>
+          <span>New Conversation</span>
+        </button>
+        <div class="sidebar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="chatSearch" placeholder="Search conversations...">
+        </div>
+      </div>
+
+      <!-- Chat History Stream -->
+      <nav class="sidebar-chats" id="chatList" aria-label="Chat History"></nav>
+
+      <!-- Sidebar Footer Tools -->
+      <div class="sidebar-footer">
+        <button class="btn-sidebar-tool" id="memoryVaultBtn">
+          <i class="fa-solid fa-brain" style="color: #a855f7;"></i>
+          <span>Memory Vault</span>
+        </button>
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          <span>Groq LPU Active • 200+ t/s</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         MAIN WORKSPACE (CHAT & CANVAS STUDIO)
+         ==================================================================== -->
+    <main class="main-workspace">
+      <!-- Chat Interface -->
+      <section class="chat-container">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+          <div class="nav-left">
+            <button class="btn-nav-icon" id="sidebarToggle" title="Toggle Sidebar">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <!-- Model Switcher Dropdown -->
+            <div class="model-selector">
+              <button class="model-selector-btn" id="modelSelectorBtn">
+                <i class="fa-solid fa-microchip" style="color: var(--cyan-primary);"></i>
+                <span id="currentModelName">GPT-OSS 120B</span>
+                <span class="model-badge" id="currentModelBadge">Flagship</span>
+                <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 4px;"></i>
+              </button>
+              <div class="model-dropdown" id="modelDropdown"></div>
+            </div>
+
+            <!-- Deep Reasoning Toggle -->
+            <button class="mode-pill" id="reasoningToggleBtn" title="Enable Step-by-Step Thinking Trace">
+              <i class="fa-solid fa-brain"></i>
+              <span>Deep Think</span>
+            </button>
+
+            <!-- Live Web Search Toggle -->
+            <button class="mode-pill" id="webSearchToggleBtn" title="Toggle Tavily Real-Time Web Search">
+              <i class="fa-solid fa-globe"></i>
+              <span>Live Web (Auto)</span>
+            </button>
+          </div>
+
+          <div class="nav-right">
+            <!-- Canvas Studio Toggle -->
+            <button class="btn-canvas-toggle" id="canvasToggleBtn" title="Toggle Split-Screen Canvas Studio">
+              <i class="fa-solid fa-laptop-code"></i>
+              <span>Canvas Studio</span>
+            </button>
+
+            <!-- Export Chat -->
+            <button class="btn-nav-icon" id="exportChatBtn" title="Export Conversation to Markdown">
+              <i class="fa-solid fa-arrow-down-to-bracket"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- Message Viewport -->
+        <div class="messages-viewport" id="messagesViewport">
+          <!-- Drop Overlay for Drag & Drop Ingestion -->
+          <div class="drop-overlay" id="dropOverlay">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Drop file here to ingest into context</span>
+          </div>
+
+          <!-- Welcome Screen (When Chat is Empty) -->
+          <div class="welcome-screen" id="welcomeScreen">
+            <div class="welcome-avatar">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h1 class="welcome-title">Welcome to OVA Studio</h1>
+            <p class="welcome-subtitle">Ultra-fast Groq intelligence, live Canvas preview, sandboxed Python runner, and real-time Tavily web research.</p>
+
+            <div class="suggestion-grid">
+              <div class="suggestion-card" data-prompt="Build an interactive 3D particle canvas simulator with pure HTML, CSS, and JavaScript that I can preview in Canvas Studio.">
+                <strong>🎨 Interactive HTML5 Canvas</strong>
+                <span>Build a particle visualizer for live preview</span>
+              </div>
+              <div class="suggestion-card" data-prompt="Write a high-performance Python script to benchmark matrix multiplication and plot execution times.">
+                <strong>⚡ Python Performance Benchmark</strong>
+                <span>Run directly inside the Canvas console</span>
+              </div>
+              <div class="suggestion-card" data-prompt="What are the latest breakthroughs in AI, open weights models, and quantum computing this week?">
+                <strong>🌐 Live Web Research</strong>
+                <span>Real-time news synthesized with Tavily citations</span>
+              </div>
+              <div class="suggestion-card" data-prompt="Explain the difference between PPO and DPO in LLM post-training with mathematical equations and intuitive diagrams.">
+                <strong>🧠 Deep Reasoning & Math</strong>
+                <span>Step-by-step thinking breakdown with KaTeX</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages Stream -->
+          <div class="messages-inner" id="messagesContainer"></div>
+        </div>
+
+        <!-- Input Dock Component -->
+        <div class="input-dock-container">
+          <div class="input-dock">
+            <!-- Attachment Tray -->
+            <div class="attachment-tray" id="attachmentTray"></div>
+
+            <!-- Input Row -->
+            <div class="input-main-row">
+              <div class="input-actions-left">
+                <!-- File Upload Hidden Input & Trigger -->
+                <input type="file" id="fileInput" style="display: none;" accept=".pdf,.txt,.csv,.json,.py,.js,.html,.css,.md,.cpp,.c,.java,.sql">
+                <button class="btn-dock-icon" id="uploadBtn" title="Attach Document / Code (PDF, CSV, PY, TXT)">
+                  <i class="fa-solid fa-paperclip"></i>
+                </button>
+                <!-- Iron Man Voice Mic Dictation -->
+                <button class="btn-dock-icon" id="micBtn" title="Iron Man Voice Mode (Dictate)">
+                  <i class="fa-solid fa-microphone"></i>
+                </button>
+                <!-- Voice Readback (TTS) Toggle -->
+                <button class="btn-dock-icon" id="ttsToggleBtn" title="Auto Voice Readback">
+                  <i class="fa-solid fa-volume-high"></i>
+                </button>
+              </div>
+
+              <!-- Textarea -->
+              <textarea id="chatInput" class="chat-textarea" rows="1" placeholder="Ask OVA anything... (Press Enter to send, Shift+Enter for new line)"></textarea>
+
+              <div class="input-actions-right">
+                <!-- Send / Stop Button -->
+                <button class="btn-send" id="sendBtn" title="Send Message">
+                  <i class="fa-solid fa-arrow-up"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Reactive Audio Soundwave Canvas -->
+            <canvas id="soundwaveCanvas" class="soundwave-bar"></canvas>
+          </div>
+          <div class="input-footer-note">Powered by Groq LPUs • Tavily Real-Time Web • SQLite Memory Vault</div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           SPLIT-SCREEN CANVAS / ARTIFACT STUDIO
+           ================================================================== -->
+      <aside class="canvas-studio" id="canvasStudio">
+        <!-- Canvas Studio Header -->
+        <div class="canvas-header">
+          <div class="canvas-title-group">
+            <i class="fa-solid fa-cube" style="color: var(--cyan-primary);"></i>
+            <span class="canvas-title" id="canvasTitle">Canvas Studio</span>
+            <span class="canvas-tag" id="canvasTag">HTML</span>
+          </div>
+
+          <div class="canvas-tabs">
+            <button class="canvas-tab active" id="canvasTabPreview">Preview</button>
+            <button class="canvas-tab" id="canvasTabCode">Code</button>
+            <button class="canvas-tab" id="canvasTabConsole">Console</button>
+          </div>
+
+          <div class="canvas-actions">
+            <button class="btn-code-action run-btn" id="canvasRunBtn" title="Execute / Refresh">
+              <i class="fa-solid fa-play"></i> Run
+            </button>
+            <button class="btn-nav-icon" id="canvasCopyBtn" title="Copy Code">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+            <button class="btn-nav-icon" id="canvasDownloadBtn" title="Download File">
+              <i class="fa-solid fa-download"></i>
+            </button>
+            <button class="btn-nav-icon" id="canvasCloseBtn" title="Close Canvas">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Canvas Studio Panes -->
+        <div class="canvas-body">
+          <!-- Preview Pane (Live Sandboxed Iframe) -->
+          <div class="canvas-pane active" id="canvasPanePreview">
+            <iframe id="canvasIframe" class="canvas-iframe" sandbox="allow-scripts allow-modals allow-same-origin allow-forms allow-popups"></iframe>
+          </div>
+
+          <!-- Code Editor Pane -->
+          <div class="canvas-pane" id="canvasPaneCode">
+            <textarea id="canvasEditor" class="canvas-editor" spellcheck="false" placeholder="Write or edit code here..."></textarea>
+          </div>
+
+          <!-- Console Output Pane -->
+          <div class="canvas-pane" id="canvasPaneConsole">
+            <div id="canvasConsole" class="canvas-console">
+              <div style="color: var(--text-dim); font-size: 0.82rem;">Terminal Ready. Execute Python code snippets to see stdout, stderr, and exit codes here.</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- ======================================================================
+       MEMORY VAULT MODAL
+       ====================================================================== -->
+  <div class="modal-backdrop" id="memoryModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-brain"></i>
+          <span>Memory Vault</span>
+        </div>
+        <button class="modal-close" id="memoryModalClose"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.5;">
+          OVA continuously learns facts and preferences you share across conversations. You can inspect, add, or delete individual memories below.
+        </p>
+
+        <div class="memory-add-box">
+          <input type="text" id="memoryInput" class="memory-add-input" placeholder="e.g. I prefer concise Python code with type hints...">
+          <button class="btn-add-memory" id="addMemoryBtn">Remember</button>
+        </div>
+
+        <div class="memory-list" id="memoryList"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-danger-outline" id="clearMemoriesBtn">Clear All Memories</button>
+        <span style="font-size: 0.75rem; color: var(--text-dim);">Stored locally in SQLite</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript App -->
+  <script src="/static/app.js"></script>
+</body>
+</html>

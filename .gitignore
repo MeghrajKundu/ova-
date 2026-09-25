@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+# Virtual environments
+venv/
+.env
+.env.*
+# Environment variables
+.env
+# Database files
+*.db
+*.sqlite3
+# Uploads folder (may contain user files)
+uploads/
+# OS files
+.DS_Store
+Thumbs.db
+# IDE/Editor directories
+.vscode/
+.idea/
+# Build artifacts
+build/
+/dist/
+*.egg-info/
+# Log files
+*.log
+# Secrets and config files
+*.pem
+*.key
+# Other temporary files
+*.tmp
+*.bak
+# End of .gitignore

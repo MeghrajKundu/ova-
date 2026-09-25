@@ -717,5 +717,6 @@ if __name__ == "__main__":
     print(f"Tavily Search: {'ACTIVE' if os.getenv('TAVILY_API_KEY') else 'DISABLED'}")
     print("Streaming (SSE): ENABLED")
     print("Canvas Studio & Code Runner: ENABLED")
-    print("http://127.0.0.1:5000\n==========================================\n")
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"http://0.0.0.0:{port}\n==========================================\n")
+    app.run(host="0.0.0.0", port=port)
